@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: lisiks
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: recipes
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  
+volumes:
+  pgdata:
