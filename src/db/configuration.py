@@ -1,12 +1,8 @@
-from sqlalchemy import create_engine, URL
+from sqlalchemy import create_engine, URL, text
 from sqlalchemy.orm import sessionmaker, Session
 
 
-database_link = URL.create(
-    drivername="sqlite",
-    database="recipes.db"
-)
-
+database_link = "postgresql+psycopg2://lisiks:lisiks@localhost:5432/recipes"
 
 engine = create_engine(
     url=database_link,
@@ -18,3 +14,6 @@ sessions = sessionmaker(
     bind=engine,
     class_=Session
 )
+
+
+

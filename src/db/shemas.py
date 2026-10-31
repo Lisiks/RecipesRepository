@@ -1,9 +1,51 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, Text, ForeignKey, PrimaryKeyConstraint
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import Integer, Text, ForeignKey, PrimaryKeyConstraint, String, Table, Column
+
 
 
 class Base(DeclarativeBase):
     ...
+
+
+
+class IngredientsType(Base):
+    __tablename__ = "ingredients_type"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    type: Mapped[str] = mapped_column(String(30), unique=True)
+
+
+
+
+class Ingredients(Base):
+    __tablename__ = "ingredients"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(30), unique=True)
+    type_id: Mapped[int] = mapped_column(Integer, ForeignKey("ingredients_type.id", name="ingredients_type_id_fk", ondelete="RESTRICT", onupdate="CASCADE"))
+
+    type: Mapped["IngredientsType"] = relationship()
+
+
+
+IngredientsResipes = Table(
+    "ingredients_resipes",
+    Base.metadata,
+    Column("ingredients_id", ForeignKey("ingredients.id", name="ingredients_id_fk", ondelete="CASCADE", onupdate="CASCADE")),
+    Column("recipe_id", ForeignKey("recipe.id", name="recipe_id_fk", ondelete="CASCADE", onupdate="CASCADE")),
+    PrimaryKeyConstraint("ingredients_id", "recipe_id", name="ingredients_resipes_pk")
+)
+
+
+
+
+class RecipeType(Base):
+    __tablename__ = "recipe_type"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    type: Mapped[str] = mapped_column(String(30), unique=True)
+
+
 
 
 class Recipe(Base):
@@ -11,6 +53,12 @@ class Recipe(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(Text, unique=True)
+    type_id: Mapped[int] = mapped_column(Integer, ForeignKey("recipe_type.id", name="recipe_type_id_fk", ondelete="RESTRICT", onupdate="CASCADE"))
+
+    type: Mapped["RecipeType"] = relationship()
+    steps: Mapped[list["RecipeStep"]] = relationship(cascade="all, delete-orphan")
+    ingridients: Mapped[list["Ingredients"]] = relationship(secondary=IngredientsResipes, cascade="all, delete-orphan")
+
 
 
 class RecipeStep(Base):
