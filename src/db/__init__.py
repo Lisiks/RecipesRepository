@@ -3,5 +3,5 @@ from .shemas import Base
 
 __all__ = [
     "database_link",
-    "Base"
+    "Base",
 ]
